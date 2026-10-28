@@ -1,0 +1,58 @@
+Sei un esperto penetration tester. Hai appena completato una valutazione di sicurezza.
+Scrivi un report professionale in italiano basandoti sui dati seguenti.
+
+Target: {{ target_ip }}
+Data: {{ date }}
+
+SERVIZI SCOPERTI:
+{% for s in discovered_services %}
+- Porta {{ s.port }}/tcp | {{ s.service_name }} | {{ s.product_version | default('versione sconosciuta') }}
+{% endfor %}
+
+VULNERABILITÀ CONFERMATE (ordinate per criticità):
+{% for v in vulnerabilities %}
+- [{{ v.severity }}] {{ v.cve_id }} | CVSS: {{ v.cvss_score }} | {{ v.description[:120] }}
+{% endfor %}
+
+RISULTATI ESECUZIONE:
+{% for r in execution_results %}
+- Step {{ r.step_number }} ({{ r.step_name }}) | {{ r.status }} | {{ r.tool }} | {{ r.output[:100] if r.output else 'nessun output' }}
+{% endfor %}
+
+Genera il report in formato JSON. Sii preciso e tecnico ma CONCISO per risparmiare token:
+- executive_summary: Regole di scrittura: Target: Il testo è destinato alla C-suite (es. CEO/CTO), quindi mantieni un tono formale, conciso e orientato ai risultati. 
+Struttura: Dividi il contenuto in 4 sezioni brevi:
+Obiettivo/Problema (1-2 frasi)
+Soluzione Proposta (2-3 frasi)
+Impatti e Metriche Chiave (bullet points con numeri/dati chiave)
+Prossimi Passi / Decisione Richiesta (1 frase)
+Vincoli: (8-12 righe), professionale! 
+- description: UNA frase per finding.
+- remediation: UNA-DUE frasi SPECIFICHE per quel servizio/CVE (campo OBBLIGATORIO su OGNI finding).
+- NON produrre il campo "evidence" (viene aggiunto dal sistema dai log reali).
+- recommendations: OBBLIGATORIE, 3 voci (IMMEDIATE, SHORT_TERM, LONG_TERM).
+
+Rispondi ESCLUSIVAMENTE con JSON valido (niente testo fuori dal JSON):
+{
+  "executive_summary": "sintesi discorsiva e articolata di 8-12 righe sul test e il suo impatto",
+  "overall_risk_level": "CRITICAL",
+  "risk_score": 9.2,
+  "findings": [
+    {
+      "id": "FIND-001",
+      "cve_id": "CVE-2011-2523",
+      "title": "Backdoor vsftpd 2.3.4",
+      "severity": "CRITICAL",
+      "cvss_score": 10.0,
+      "affected_service": "vsftpd su porta 21",
+      "description": "una frase",
+      "remediation": "una-due frasi specifiche (OBBLIGATORIO)",
+      "references": ["https://nvd.nist.gov/vuln/detail/CVE-2011-2523"]
+    }
+  ],
+  "recommendations": [
+    {"priority": "IMMEDIATE",  "action": "...", "effort": "low"},
+    {"priority": "SHORT_TERM", "action": "...", "effort": "medium"},
+    {"priority": "LONG_TERM",  "action": "...", "effort": "high"}
+  ]
+}

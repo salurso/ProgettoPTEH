@@ -1,0 +1,25 @@
+# Dipendenze aggregate del framework (installa tutto con: pip install -r requirements.txt)
+
+# LLM + template
+groq
+python-dotenv
+jinja2
+pydantic
+
+# Recon / Attack Surface Mapper
+python-libnmap
+networkx
+
+# Vulnerability Hypothesis Generator
+requests
+
+# Exploit Plan Designer / Attack Executor
+pyyaml
+pymetasploit3
+
+# Reporting Engine (export PDF)
+weasyprint
+
+# Test
+pytest
+pytest-asyncio

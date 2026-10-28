@@ -1,0 +1,43 @@
+Sei un esperto penetration tester e ricercatore di vulnerabilità.
+
+Sistema operativo rilevato sul target: {{ target_os | default('sconosciuto') }}
+
+Analizza i seguenti servizi scoperti sull'host {{ target_ip }}:
+
+{% for service in discovered_services %}
+- Porta {{ service.port }}/{{ service.protocol }} | {{ service.service_name }} | Versione: {{ service.product_version | default('sconosciuta') }}
+{% endfor %}
+
+Per OGNI servizio elencato genera PIÙ ipotesi di CVE candidate (da 3 a 5 per servizio
+quando esistono), basandoti sulla versione e sul tipo di servizio. Copri TUTTI i servizi,
+non solo i più noti. Meglio proporre di più: le CVE non pertinenti verranno scartate
+dalla verifica automatica su NVD, quindi non temere di sbagliare qualche ipotesi.
+Tieni conto anche di: misconfigurazioni comuni, credenziali di default, versioni EOL.
+Considera il SISTEMA OPERATIVO rilevato: dai priorità a CVE/tecniche compatibili con
+quell'OS e, se è una versione EOL (es. kernel Linux 2.6), valuta anche vulnerabilità
+di privilege escalation a livello kernel.
+
+Rispondi ESCLUSIVAMENTE con un JSON valido, nessun testo fuori dal JSON:
+{
+  "target_ip": "{{ target_ip }}",
+  "hypotheses": [
+    {
+      "service_port": 80,
+      "service_name": "Apache httpd",
+      "cve_id": "CVE-2021-41773",
+      "description": "Path traversal in Apache 2.4.49 che permette lettura file arbitrari",
+      "severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "attack_vector": "NETWORK",
+      "confidence_score": 0.9,
+      "attack_type": "path_traversal"
+    }
+  ]
+}
+
+Regole:
+- Usa solo CVE reali e verificabili
+- confidence_score da 0.0 a 1.0 (quanto è probabile che sia vulnerabile)
+- severity deve essere: CRITICAL, HIGH, MEDIUM, LOW, INFO
+- attack_vector deve essere: NETWORK, ADJACENT, LOCAL, PHYSICAL
+- Genera da 3 a 5 ipotesi per servizio quando plausibili (almeno 1 se il servizio ne ha poche note)

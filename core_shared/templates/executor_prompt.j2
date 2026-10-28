@@ -1,0 +1,18 @@
+Simula l'esecuzione dei seguenti passaggi di exploit per il target {{ target_ip }}:
+
+{% for step in exploit_steps %}
+- Step {{ step.step_number }} | CVE: {{ step.cve_target }} | Azione: {{ step.action }} | Tool/Payload: {{ step.tool_or_payload }}
+{% endfor %}
+
+Simula l'esito dell'esecuzione tecnica di ciascun passaggio, determinando se ha avuto successo o meno e registrando l'output osservato.
+Restituisci l'output ESCLUSIVAMENTE in formato JSON valido, rispettando questa struttura:
+{
+  "target_ip": "{{ target_ip }}",
+  "execution_results": [
+    {
+      "step_number": <numero_step>,
+      "status": "<SUCCESS o FAILED>",
+      "output_log": "<dettaglio dell'output simulato o osservato>"
+    }
+  ]
+}

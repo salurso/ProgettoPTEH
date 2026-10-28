@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Attack Surface Mapping Output",
+    "type": "object",
+    "properties": {
+        "target_ip": {
+            "type": "string",
+            "format": "ipv4"
+        },
+        "discovered_services": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "port": {
+                        "type": "integer"
+                    },
+                    "protocol": {
+                        "type": "string"
+                    },
+                    "service_name": {
+                        "type": "string"
+                    },
+                    "product_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "port",
+                    "protocol",
+                    "service_name"
+                ]
+            }
+        }
+    },
+    "required": [
+        "target_ip",
+        "discovered_services"
+    ]
+}

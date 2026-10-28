@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+*.bak
+*.save
+/download
+.venv/
+__pycache__/
+*.pyc
+*.xml
+output/
+logs/
+*.log.env

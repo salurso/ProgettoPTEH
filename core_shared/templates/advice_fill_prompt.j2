@@ -1,0 +1,33 @@
+Sei un esperto penetration tester. Devi fornire SOLO i consigli mancanti
+per un report già redatto. Rispondi in italiano, tecnico e specifico.
+Le azioni le decidi TU in base alle vulnerabilità realmente trovate su questo host
+(elenco sotto): non usare frasi generiche né elenchi preconfezionati.
+
+Target: {{ target_ip }}
+Sistema operativo: {{ target_os | default('sconosciuto') }}
+
+VULNERABILITÀ TROVATE (usale per decidere i consigli):
+{% for v in vulnerabilities %}
+- [{{ v.severity }}] {{ v.cve_id }} | {{ v.service_name }} | {{ (v.description or '')[:100] }}
+{% endfor %}
+
+{% if findings_missing %}
+Per ciascuno di questi finding scrivi una remediation SPECIFICA (non generica):
+{% for f in findings_missing %}
+- id={{ f.id }} | {{ f.cve_id }} | {{ f.affected_service }} | {{ f.title }}
+{% endfor %}
+{% endif %}
+{% if missing_tiers %}
+Fornisci le raccomandazioni SOLO per questi livelli mancanti: {{ missing_tiers | join(', ') }}.
+Per ciascun livello, l'azione deve derivare dalle vulnerabilità elencate sopra.
+{% endif %}
+
+Rispondi ESCLUSIVAMENTE con JSON valido in questo formato:
+{
+  "remediations": {
+{% for f in findings_missing %}    "{{ f.id }}": "remediation specifica per {{ f.cve_id }} / {{ f.affected_service }}"{% if not loop.last %},{% endif %}
+{% endfor %}  },
+  "recommendations": [
+{% for t in missing_tiers %}    {"priority": "{{ t }}", "action": "...", "effort": "..."}{% if not loop.last %},{% endif %}
+{% endfor %}  ]
+}

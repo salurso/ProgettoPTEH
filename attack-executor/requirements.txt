@@ -1,0 +1,6 @@
+groq
+python-dotenv
+jinja2
+pydantic
+pyyaml
+pymetasploit3

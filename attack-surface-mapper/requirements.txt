@@ -1,0 +1,6 @@
+groq
+python-dotenv
+jinja2
+python-libnmap
+networkx==3.1
+pydantic==2.4.2

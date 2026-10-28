@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "VulnerabilityHypothesesOutput",
+    "type": "object",
+    "properties": {
+        "target_ip": {
+            "type": "string",
+            "format": "ipv4"
+        },
+        "hypotheses": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "service_port": {
+                        "type": "integer"
+                    },
+                    "cve_id": {
+                        "type": "string"
+                    },
+                    "confidence_score": {
+                        "type": "number"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "service_port",
+                    "cve_id",
+                    "confidence_score"
+                ]
+            }
+        }
+    },
+    "required": [
+        "target_ip",
+        "hypotheses"
+    ]
+}

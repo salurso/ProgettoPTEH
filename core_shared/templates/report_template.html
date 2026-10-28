@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentest Report — {{ target_ip }}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+            color: #1a1a2e;
+            background: #f4f6f9;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            background: #1a1a2e;
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .meta {
+            font-size: 13px;
+            opacity: 0.75;
+        }
+
+        /* Risk badge */
+        .risk-banner {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .risk-CRITICAL {
+            background: #fde8e8;
+            border-left: 5px solid #e53e3e;
+        }
+
+        .risk-HIGH {
+            background: #fef3e2;
+            border-left: 5px solid #dd6b20;
+        }
+
+        .risk-MEDIUM {
+            background: #fefce8;
+            border-left: 5px solid #d69e2e;
+        }
+
+        .risk-LOW {
+            background: #e6fffa;
+            border-left: 5px solid #38a169;
+        }
+
+        .risk-label {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .risk-score {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-left: auto;
+        }
+
+        /* Sections */
+        .section {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1rem 1.5rem;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .section-header:hover {
+            background: #edf2f7;
+        }
+
+        .section-body {
+            padding: 1.5rem;
+            display: block;
+        }
+
+        .section-body.collapsed {
+            display: none;
+        }
+
+        .chevron {
+            transition: transform 0.2s;
+        }
+
+        .chevron.open {
+            transform: rotate(180deg);
+        }
+
+        /* Executive summary */
+        .exec-summary {
+            line-height: 1.8;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        /* Finding card */
+        .finding {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .finding-header {
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .finding-header:hover {
+            opacity: 0.9;
+        }
+
+        .finding-body {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e2e8f0;
+            display: none;
+        }
+
+        .finding-body.open {
+            display: block;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-CRITICAL {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge-HIGH {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .badge-MEDIUM {
+            background: #fefcbf;
+            color: #b7791f;
+        }
+
+        .badge-LOW {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        .finding-title {
+            font-weight: 600;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .cvss-pill {
+            background: #1a1a2e;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Detail rows */
+        .detail-row {
+            margin-bottom: 0.9rem;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: 4px;
+        }
+
+        /* Recommendations */
+        .rec-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            background: #f7fafc;
+        }
+
+        .priority-IMMEDIATE {
+            border-left: 4px solid #e53e3e;
+        }
+
+        .priority-SHORT_TERM {
+            border-left: 4px solid #dd6b20;
+        }
+
+        .priority-LONG_TERM {
+            border-left: 4px solid #38a169;
+        }
+
+        .rec-priority {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            min-width: 90px;
+            padding-top: 2px;
+        }
+
+        .rec-action {
+            font-size: 13px;
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .rec-effort {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        /* Stats bar */
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: 120px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        .num-critical {
+            color: #e53e3e;
+        }
+
+        .num-high {
+            color: #dd6b20;
+        }
+
+        .num-medium {
+            color: #d69e2e;
+        }
+
+        .num-low {
+            color: #38a169;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 2rem;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>🔐 Penetration Test Report</h1>
+            <div class="meta">
+                Target: <strong>{{ target_ip }}</strong> &nbsp;|&nbsp;
+                Data: <strong>{{ date }}</strong> &nbsp;|&nbsp;
+                Metodologia: {{ report.methodology }}
+            </div>
+        </div>
+
+        <!-- Risk banner -->
+        <div class="risk-banner risk-{{ report.overall_risk_level }}">
+            <div>
+                <div class="detail-label">Rischio complessivo</div>
+                <div class="risk-label">{{ report.overall_risk_level }}</div>
+            </div>
+            <div class="risk-score">{{ report.risk_score }}/10</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-num num-critical">{{ findings_by_severity.CRITICAL | default(0) }}</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num num-high">{{ findings_by_severity.HIGH | default(0) }}</div>
+                <div class="stat-label">High</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num num-medium">{{ findings_by_severity.MEDIUM | default(0) }}</div>
+                <div class="stat-label">Medium</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num num-low">{{ findings_by_severity.LOW | default(0) }}</div>
+                <div class="stat-label">Low</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" style="color:#1a1a2e">{{ total_steps }}</div>
+                <div class="stat-label">Step eseguiti</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" style="color:#38a169">{{ success_steps }}</div>
+                <div class="stat-label">Successi</div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                📋 Executive Summary <span class="chevron open">▼</span>
+            </div>
+            <div class="section-body">
+                <p class="exec-summary">{{ report.executive_summary }}</p>
+			{% if report.report_source == 'llm' %}<span style="font-size:11px;color:#2b6cb0;border:1px solid #2b6cb0;border-radius:4px;padding:1px 5px;">generato da LLM</span>
+{% elif report.report_source == 'code_fallback' %}<span style="font-size:11px;color:#a0aec0;border:1px solid #a0aec0;border-radius:4px;padding:1px 5px;">default codice</span>{% endif %}	
+            </div>
+        </div>
+
+        <!-- Findings -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                🔍 Vulnerabilità Trovate ({{ report.findings | length }}) <span class="chevron open">▼</span>
+            </div>
+            <div class="section-body">
+                {% for f in report.findings %}
+                <div class="finding">
+                    <div class="finding-header" onclick="toggleFinding(this)">
+                        <span class="badge badge-{{ f.severity }}">{{ f.severity }}</span>
+                        <span class="finding-title">{{ f.id }} — {{ f.title }}</span>
+                        <span class="cvss-pill">CVSS {{ f.cvss_score }}</span>
+                    </div>
+                    <div class="finding-body">
+                        <div class="detail-row">
+                            <div class="detail-label">Servizio Affetto</div>
+                            <div class="detail-value">{{ f.affected_service }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Descrizione Tecnica</div>
+                            <div class="detail-value">{{ f.description }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Exploitation Path</div>
+                            <div class="detail-value">{{ f.exploitation_path }}</div>
+                        </div>
+                        {% if f.evidence %}
+                        <div class="detail-row">
+                            <div class="detail-label">Evidenza (Log/Output)</div>
+                            <div class="code-block">{{ f.evidence }}</div>
+                        </div>
+                        {% endif %}
+                        <div class="detail-row">
+                            <div class="detail-label">Remediation</div>
+                            <div class="detail-value" style="color:#276749">✅ {{ f.remediation }}
+                                {% if f.remediation_source == 'llm' %}<span style="font-size:11px;color:#2b6cb0;border:1px solid #2b6cb0;border-radius:4px;padding:1px 5px;margin-left:6px;">generata da LLM</span>
+                                {% elif f.remediation_source == 'code_fallback' %}<span style="font-size:11px;color:#a0aec0;border:1px solid #a0aec0;border-radius:4px;padding:1px 5px;margin-left:6px;">default codice</span>{% endif %}
+                            </div>
+                        </div>
+                        {% if f.references %}
+                        <div class="detail-row">
+                            <div class="detail-label">Riferimenti</div>
+                            <div class="detail-value">
+                                {% for ref in f.references %}
+                                <a href="{{ ref }}" style="color:#3182ce">{{ ref }}</a><br>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Execution Log -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                ⚙️ Log Esecuzione <span class="chevron open">▼</span>
+            </div>
+            <div class="section-body">
+                {% for r in execution_results %}
+                <div style="display:flex;gap:0.75rem;align-items:flex-start;
+                  padding:0.6rem 0;border-bottom:1px solid #f0f0f0;">
+                    <span
+                        style="font-weight:700;color:{% if r.status == 'SUCCESS' %}#38a169{% elif r.status == 'FAILED' %}#e53e3e{% else %}#718096{% endif %}">
+                        {{ r.status }}
+                    </span>
+                    <span style="color:#718096;min-width:60px">Step {{ r.step_number }}</span>
+                    <span style="font-family:monospace;font-size:12px;color:#2d3748">
+                        {{ r.tool }} — {{ r.step_name }}
+                    </span>
+                    {% if r.output %}
+                    <span style="font-family:monospace;font-size:11px;color:#718096;
+                      margin-left:auto;max-width:320px;white-space:pre-wrap;
+                      word-break:break-word;overflow-wrap:anywhere">
+                        {{ r.output[:200] }}
+                    </span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                🛡️ Raccomandazioni <span class="chevron open">▼</span>
+            </div>
+            <div class="section-body">
+                {% for rec in report.recommendations %}
+                <div class="rec-item priority-{{ rec.priority }}">
+                    <div class="rec-priority">{{ rec.priority.replace('_',' ') }}</div>
+                    <div>
+                        <div class="rec-action">{{ rec.action }}
+                            {% if rec.source == 'llm' %}<span style="font-size:11px;color:#2b6cb0;border:1px solid #2b6cb0;border-radius:4px;padding:1px 5px;margin-left:6px;">generata da LLM</span>
+                            {% elif rec.source == 'code_fallback' %}<span style="font-size:11px;color:#a0aec0;border:1px solid #a0aec0;border-radius:4px;padding:1px 5px;margin-left:6px;">default codice</span>{% endif %}
+                        </div>
+                        <div class="rec-effort">Effort: {{ rec.effort }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="footer">
+            {{ report.disclaimer }}<br>
+            Report generato automaticamente da LLM Pentest Framework
+        </div>
+
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            const body = header.nextElementSibling;
+            const chevron = header.querySelector('.chevron');
+            const isOpen = !body.classList.contains('collapsed');
+            body.classList.toggle('collapsed', isOpen);
+            chevron.classList.toggle('open', !isOpen);
+        }
+        function toggleFinding(header) {
+            const body = header.nextElementSibling;
+            body.classList.toggle('open');
+        }
+        // Apri il primo finding di default
+        document.addEventListener('DOMContentLoaded', () => {
+            const first = document.querySelector('.finding-body');
+            if (first) first.classList.add('open');
+        });
+    </script>
+</body>
+
+</html>

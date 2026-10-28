@@ -1,0 +1,5 @@
+groq
+python-dotenv
+jinja2
+pydantic
+weasyprint
