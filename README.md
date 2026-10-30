@@ -2,7 +2,7 @@
 
 Framework autonomo di **penetration testing guidato da Large Language Model (LLM)**, sviluppato per il corso di *Penetration Testing and Ethical Hacking* (A.A. 2025/2026, Università degli Studi di Salerno).
 
-Il sistema automatizza l'intero ciclo di vita di un penetration test — ricognizione, mappatura della superficie d'attacco, generazione di ipotesi di vulnerabilità, pianificazione ed esecuzione degli exploit e reporting — a partire da un singolo input (l'indirizzo del target) e fino a un report finale strutturato.
+Il sistema automatizza l'intero ciclo di vita di un penetration test: ricognizione, mappatura della superficie d'attacco, generazione di ipotesi di vulnerabilità, pianificazione ed esecuzione degli exploit e reporting, a partire da un singolo input (l'indirizzo del target) e fino a un report finale strutturato.
 
 > **Principio guida: _"l'LLM propone, il codice verifica"._**
 > L'LLM fornisce ragionamento e linguaggio naturale; il codice garantisce determinismo, verifica e assenza di falsi positivi nel report finale.
