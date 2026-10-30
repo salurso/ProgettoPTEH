@@ -122,9 +122,9 @@ python tests/test_metrics.py                   # (opzionale) → metrics.json
 ├── core_shared/               # LLM client, templates (Jinja2), schemas, ethics
 ├── tests/                     # test unitari e calcolo metriche
 ├── docs/                      # architettura, contratti dei moduli, disclosure
-├── run_pipeline.sh            # orchestratore
+├── run_pipeline.sh            
 ├── requirements.txt
-└── .env.example               # template di configurazione
+└── .env.example               
 ```
 
 ---
